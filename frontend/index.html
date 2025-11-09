@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Ticket Analytics Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <h1><i class="fas fa-chart-line"></i> Advanced Ticket Analytics</h1>
+      <p>Comprehensive analytics dashboard with multi-select filters, category breakdown, and real-time insights</p>
+    </header>
+
+    <!-- Stats Overview -->
+    <section class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-label">Total Tickets</div>
+        <div class="stat-value" id="totalTickets">-</div>
+        <div class="muted">Selected period</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Daily Average</div>
+        <div class="stat-value" id="dailyAverage">-</div>
+        <div class="muted">Tickets per day</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Days</div>
+        <div class="stat-value" id="totalDays">-</div>
+        <div class="muted">In range</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Categories</div>
+        <div class="stat-value" id="totalCategories">-</div>
+        <div class="muted">Active categories</div>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="card controls">
+      <div class="row">
+        <div class="field">
+          <label for="from"><i class="fas fa-calendar-alt"></i> From Date</label>
+          <input type="date" id="from" />
+        </div>
+        <div class="field">
+          <label for="to"><i class="fas fa-calendar-alt"></i> To Date</label>
+          <input type="date" id="to" />
+        </div>
+        <div class="field">
+          <label>Quick Filters</label>
+          <div class="quick-filters">
+            <button id="quick7" class="chip">Last 7d</button>
+            <button id="quick30" class="chip">Last 30d</button>
+            <button id="quick90" class="chip">Last 90d</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="plan"><i class="fas fa-layer-group"></i> Plan Types</label>
+          <div class="multi-select" id="planMultiSelect">
+            <div class="multi-select-toggle">
+              <span>Select Plan Types</span>
+              <span class="selected-count" id="planCount">0 selected</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="multi-select-dropdown" id="planDropdown" hidden></div>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label for="category"><i class="fas fa-tags"></i> Category Filter</label>
+          <div class="multi-select" id="categoryMultiSelect">
+            <div class="multi-select-toggle">
+              <span>Select Categories</span>
+              <span class="selected-count" id="categoryCount">0 selected</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="multi-select-dropdown" id="categoryDropdown" hidden></div>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label for="sortBy"><i class="fas fa-sort"></i> Sort By</label>
+          <select id="sortBy">
+            <option value="count" selected>Count</option>
+            <option value="category">Category</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sortOrder"><i class="fas fa-sort-amount-down"></i> Order</label>
+          <select id="sortOrder">
+            <option value="desc" selected>Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="loadBtn" class="primary">
+            <i class="fas fa-sync-alt"></i> Load Data
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field toggles">
+          <label><input type="checkbox" id="showPercent"> Show percentage of day</label>
+          <label><input type="checkbox" id="heatmap" checked> Enable heatmap</label>
+          <label><input type="checkbox" id="showTrend" checked> Show trend line</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section class="card">
+      <div class="section-head">
+        <h2><i class="fas fa-chart-bar"></i> Daily Ticket Volume</h2>
+        <div id="lastUpdated" class="muted"></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="dailyChart" height="300"></canvas>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="card">
+      <div class="section-head">
+        <h2><i class="fas fa-table"></i> Daily Category Breakdown</h2>
+        <div class="muted" id="tableInfo"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div id="empty" class="empty" hidden>
+        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>No data available for the current filters</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
