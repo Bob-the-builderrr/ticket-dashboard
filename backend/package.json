@@ -1,18 +1,25 @@
 {
   "name": "ticket-dashboard-backend",
   "version": "1.0.0",
-  "private": true,
-  "type": "commonjs",
-  "engines": { "node": "20.x" },
+  "description": "Backend for Ticket Dashboard using Express and Turso",
   "main": "server-turso.js",
   "scripts": {
     "start": "node server-turso.js",
-    "import": "node importCSV-turso.js"
+    "import": "node importCSV-turso.js",
+    "dev": "nodemon server-turso.js"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
+    "dotenv": "^16.3.1",
     "express": "^5.1.0"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "license": "ISC"
 }
