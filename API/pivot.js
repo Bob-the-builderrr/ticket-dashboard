@@ -1,12 +1,14 @@
-const db = require('./_db');
+const { db, ensureSchema } = require('./_db');
 
-module.exports = async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
+    await ensureSchema();
+
     const { from, to, sortBy, sortOrder, plan_types, categories } = req.query;
-    if (!from || !to) return res.status(400).json({ error: 'Please provide from and to dates' });
+    if (!from || !to) return res.status(400).json({ error: 'Provide from and to (YYYY-MM-DD)' });
 
     const sortField = sortBy === 'category' ? 'category' : 'count';
-    const order = (sortOrder || '').toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+    const order = (String(sortOrder || '').toLowerCase() === 'asc') ? 'ASC' : 'DESC';
 
     let where = `WHERE date BETWEEN ? AND ?`;
     const params = [from, to];
@@ -37,6 +39,7 @@ module.exports = async function handler(req, res) {
     const r = await db.execute(sql, params);
     res.status(200).json(r.rows);
   } catch (e) {
-    res.status(500).json({ error: String(e.message || e) });
+    console.error('Error /api/pivot:', e);
+    res.status(500).json({ error: e.message || 'Internal error' });
   }
 };

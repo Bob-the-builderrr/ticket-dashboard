@@ -1,8 +1,7 @@
-// ----- Config -----
-// ✅ FIXED: Proper API base for both local and production
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-  ? 'http://localhost:5000' 
-  : 'https://ticket-dashboard-phi.vercel.app';
+const API_BASE =
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000'
+    : ''; // use same-origin /api on Vercel
 
 // ----- State -----
 let chart;
