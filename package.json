@@ -1,5 +1,5 @@
 {
-  "name": "turso-dashboard",
+  "name": "ticket-dashboard",
   "private": true,
   "type": "commonjs",
   "engines": { "node": ">=18" },
