@@ -1,8 +1,7 @@
 {
   "name": "ticket-dashboard",
   "private": true,
-  "type": "commonjs",
-  "engines": { "node": ">=18" },
+  "engines": { "node": "20.x" },
   "dependencies": {
     "@libsql/client": "^0.15.15"
   }
