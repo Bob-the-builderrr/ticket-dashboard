@@ -2,7 +2,7 @@
   "name": "ticket-dashboard",
   "private": true,
   "version": "1.0.0",
-  "engines": { "node": "18.x" },
+  "engines": { "node": "22.x" },
   "dependencies": {
     "@libsql/client": "^0.15.15"
   },
