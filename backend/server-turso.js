@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@libsql/client');
 
-// 🔒 Hardcoded Turso creds (as you requested)
+// 🔒 Hardcoded Turso credentials
 const RAW_TURSO_URL = 'https://dashboard-v2-new-bob-the-builderrr.aws-us-east-1.turso.io';
 const TURSO_TOKEN   = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NjI2ODU5MDgsImlkIjoiYjIwYmEzYmMtNDM1ZS00MTZkLTg1NTgtZjNiMWU0MjU1Njk2IiwicmlkIjoiYTk5ZjBlOWYtNjZmMy00MmFmLWFhYzAtNDRjNjY5Y2Y4NDhkIn0.wstJXPnEZ9ApXRp5rknkc2GfD-6AeCMTNSzdjoovOC_Cd3LqNjRR-TUKHvtqYArmmigAA1DKDGvG1UVCuEBADw';
 
 const db = createClient({ url: RAW_TURSO_URL, authToken: TURSO_TOKEN });
 
-// Ensure table exists
+// ✅ Ensure table exists
 async function createTables() {
   await db.execute('SELECT 1');
   await db.execute(`
@@ -31,7 +31,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Helpers
+// Helper: build dynamic WHERE clause and parameter array
 function buildWhere(q) {
   const { from, to, plan_types, categories } = q;
   if (!from || !to) {
@@ -44,18 +44,27 @@ function buildWhere(q) {
 
   if (plan_types && plan_types !== 'ALL') {
     const arr = String(plan_types).split(',').map(s => s.trim()).filter(Boolean);
-    if (arr.length) { where += ` AND plan_type IN (${arr.map(() => '?').join(',')})`; params.push(...arr); }
+    if (arr.length) {
+      where += ` AND plan_type IN (${arr.map(() => '?').join(',')})`;
+      params.push(...arr);
+    }
   }
   if (categories && categories !== 'ALL') {
     const cats = String(categories).split(',').map(s => s.trim()).filter(Boolean);
-    if (cats.length) { where += ` AND category IN (${cats.map(() => '?').join(',')})`; params.push(...cats); }
+    if (cats.length) {
+      where += ` AND category IN (${cats.map(() => '?').join(',')})`;
+      params.push(...cats);
+    }
   }
   return { where, params };
 }
 
-// Routes
+// ---------- ROUTES ----------
+
+// Health check
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+// Distinct plan types
 app.get('/api/plan-types', async (_req, res) => {
   try {
     const { rows } = await db.execute(`
@@ -65,9 +74,12 @@ app.get('/api/plan-types', async (_req, res) => {
       ORDER BY plan_type ASC
     `);
     res.json(rows.map(r => r.plan_type));
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
+// Distinct categories
 app.get('/api/categories', async (_req, res) => {
   try {
     const { rows } = await db.execute(`
@@ -77,9 +89,12 @@ app.get('/api/categories', async (_req, res) => {
       ORDER BY category ASC
     `);
     res.json(rows.map(r => r.category));
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
+// Tickets summary by date
 app.get('/api/tickets', async (req, res) => {
   try {
     const { where, params } = buildWhere(req.query);
@@ -91,9 +106,12 @@ app.get('/api/tickets', async (req, res) => {
       ORDER BY date ASC
     `, params);
     res.json(rows);
-  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message });
+  }
 });
 
+// Category/date pivot
 app.get('/api/pivot', async (req, res) => {
   try {
     const sortField = req.query.sortBy === 'category' ? 'category' : 'count';
@@ -107,9 +125,12 @@ app.get('/api/pivot', async (req, res) => {
       ORDER BY date ASC, ${sortField} ${order}
     `, params);
     res.json(rows);
-  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message });
+  }
 });
 
+// Summary (Turso-safe fix: duplicate params)
 app.get('/api/summary', async (req, res) => {
   try {
     const { where, params } = buildWhere(req.query);
@@ -125,15 +146,20 @@ app.get('/api/summary', async (req, res) => {
         (SELECT COUNT(*) FROM daily_counts)         AS total_days,
         (SELECT COUNT(DISTINCT category) FROM tickets ${where}) AS total_categories,
         (SELECT AVG(daily_count) FROM daily_counts) AS avg_daily_tickets
-    `, params);
+    `, [...params, ...params]); // ✅ Duplicate params since ${where} appears twice
     res.json(rows[0] || {});
-  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message });
+  }
 });
 
-// Boot
+// ---------- START SERVER ----------
 (async function start() {
   const ok = await createTables();
-  if (!ok) { console.error('DB init failed'); process.exit(1); }
+  if (!ok) {
+    console.error('DB init failed');
+    process.exit(1);
+  }
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
 })();
