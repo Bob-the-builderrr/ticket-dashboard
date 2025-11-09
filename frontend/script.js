@@ -1,8 +1,8 @@
 // ----- API base (auto: local dev vs Vercel) -----
-const API_BASE = '';
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : ''; // relative to same origin on Vercel
+const API_BASE = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+  ? 'http://localhost:5000'  // local dev
+  : '';                       // Vercel: same-origin /api
+
 
 // ----- State -----
 let chart;
