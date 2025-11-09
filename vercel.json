@@ -1,12 +1,10 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.js": { "runtime": "nodejs22.x" }
+    "api/**/*.js": {
+      "runtime": "nodejs22.x"
+    }
   },
-  "builds": [
-    { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "frontend/**", "use": "@vercel/static" }
-  ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/frontend/$1" }
