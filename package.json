@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "commonjs",
-  "engines": { "node": "22.x" },
+  "engines": { "node": "20.x" },
   "dependencies": {
     "@libsql/client": "^0.15.15"
   },
   "scripts": {
-    "start": "echo 'Vercel uses serverless functions'",
     "build": "echo 'no build needed'"
   }
 }
