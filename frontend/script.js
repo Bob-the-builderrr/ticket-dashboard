@@ -1,23 +1,12 @@
-const API_BASE =
-  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5000'
-    : ''; // use same-origin /api on Vercel
+// ----- Config -----
+// Use same-origin /api on Vercel; use localhost when developing
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000'
+  : ''; // production uses relative /api
 
 // ----- State -----
-let chart;
-let state = {
-  showPercent: false,
-  heatmap: true,
-  showTrend: true,
-  sortBy: 'count',
-  sortOrder: 'desc',
-  selectedPlans: [],
-  selectedCategories: []
-};
-
-// ----- State -----
-let chart;
-let state = {
+let chart = null;
+const state = {
   showPercent: false,
   heatmap: true,
   showTrend: true,
